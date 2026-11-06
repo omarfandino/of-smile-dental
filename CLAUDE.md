@@ -3,7 +3,7 @@
 ## What this project is
 Web MVP for Dr. Laura's dental clinic (1 doctor + 1 assistant).
 Business goal: cut no-shows (~30%) and stop patients from abandoning multi-session treatments.
-Scope of this deliverable: **the patient registration feature** (`specs/001-patient-registration.md`) inside a **visual-only app shell** (`specs/002-app-shell.md`), deployed as a public demo (`specs/003-cloud-deployment.md`): only Overview (static mock) and Patients work; every other menu item is decorative.
+Scope of this deliverable: **the patient registration feature** (`specs/001-patient-registration.md`) inside a **visual-only app shell** (`specs/002-app-shell.md`), deployed as a public demo (`specs/003-cloud-deployment.md`): only Overview (static mock) and Patients (register + delete, `specs/004-delete-patient.md`) work; every other menu item is decorative.
 Appointments, treatments, `wa.me` reminders and follow-up are out of scope (later phase).
 
 ## User

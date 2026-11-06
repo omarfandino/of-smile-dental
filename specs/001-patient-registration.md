@@ -37,7 +37,7 @@ PostgreSQL (see spec 003). Locally it runs in a container with a named Docker vo
 
 ### Scope decisions
 - No login or roles: a single person uses it on their own machine. Authentication is added before exposing it to the internet (later phase).
-- No editing or deleting patients in this deliverable.
+- No editing patients in this deliverable. Deleting is covered by spec 004.
 - No appointment history yet; it links in with the appointments spec.
 
 ## 3. Acceptance criteria

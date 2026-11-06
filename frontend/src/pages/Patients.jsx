@@ -25,7 +25,12 @@ export default function Patients() {
       </div>
       <div className="patients-grid">
         <PatientForm onCreated={(p) => setPatients((list) => [p, ...list])} />
-        <PatientList patients={patients} loading={loading} error={error} />
+        <PatientList
+          patients={patients}
+          loading={loading}
+          error={error}
+          onDeleted={(id) => setPatients((list) => list.filter((p) => p.id !== id))}
+        />
       </div>
     </>
   );

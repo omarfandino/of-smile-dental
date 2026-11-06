@@ -21,6 +21,7 @@
   --info: #3b82f6;
   --warning: #f59e0b;
   --danger: #f87171;
+  --on-danger: #1c0a0a; /* text on red: dark, white lacks contrast */
   --success: #00b16c;
 
   /* Soft tints (badges, avatars, soft buttons) */

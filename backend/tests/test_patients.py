@@ -60,3 +60,37 @@ def test_database_url_ignores_surrounding_quotes(monkeypatch):
 
     monkeypatch.setenv("DATABASE_URL", ' "postgresql://u:p@h/db" ')
     assert main.database_url() == "postgresql://u:p@h/db"
+
+
+def _create(client, name="Ana", whatsapp="3001234567"):
+    return client.post("/api/patients", json={"name": name, "whatsapp": whatsapp}).json()
+
+
+def test_delete_removes_and_persists(client):
+    keep = _create(client, "Luis", "3009998888")
+    gone = _create(client)
+    assert client.delete(f"/api/patients/{gone['id']}").status_code == 204
+    names = [p["name"] for p in client.get("/api/patients").json()]
+    assert names == ["Luis"]
+    restarted = load_app(reset=False)  # simulates an app restart on the same database
+    assert [p["id"] for p in restarted.get("/api/patients").json()] == [keep["id"]]
+
+
+def test_delete_unknown_or_twice_is_404(client):
+    p = _create(client)
+    assert client.delete("/api/patients/999999").status_code == 404
+    assert client.delete(f"/api/patients/{p['id']}").status_code == 204
+    r = client.delete(f"/api/patients/{p['id']}")
+    assert r.status_code == 404
+    assert r.json() == {"errors": {"general": "Patient not found"}}
+    assert client.delete("/api/patients/0").status_code == 422
+    assert client.delete("/api/patients/99999999999999999999").status_code == 422
+
+
+def test_delete_frees_the_whatsapp(client):
+    p = _create(client)
+    client.delete(f"/api/patients/{p['id']}")
+    r = client.post(
+        "/api/patients", json={"name": "Ana Again", "whatsapp": "+57 300 123 4567"}
+    )
+    assert r.status_code == 201

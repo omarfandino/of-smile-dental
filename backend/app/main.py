@@ -3,7 +3,7 @@ import re
 from contextlib import contextmanager
 
 import psycopg
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Path, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -167,6 +167,18 @@ def create_app() -> FastAPI:
                     },
                 )
         return row_to_dict(row)
+
+    @app.delete("/api/patients/{patient_id}", status_code=204)
+    def delete_patient(patient_id: int = Path(ge=1, le=9223372036854775807)):
+        with get_conn() as conn:
+            row = conn.execute(
+                "DELETE FROM patients WHERE id = %s RETURNING id", (patient_id,)
+            ).fetchone()
+        if row is None:
+            return JSONResponse(
+                status_code=404, content={"errors": {"general": "Patient not found"}}
+            )
+        return Response(status_code=204)
 
     # The built UI is served last so it never shadows /api routes.
     static_dir = os.environ.get("STATIC_DIR", "/srv/static")

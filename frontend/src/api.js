@@ -29,3 +29,15 @@ export async function getHealth() {
     return {};
   }
 }
+
+export async function deletePatient(id) {
+  let r;
+  try {
+    r = await fetch(`/api/patients/${id}`, { method: "DELETE" });
+  } catch {
+    return { error: "Could not delete. Please try again." };
+  }
+  // 404 means it was already deleted elsewhere: the end result is the same.
+  if (r.status === 204 || r.status === 404) return { ok: true };
+  return { error: "Could not delete. Please try again." };
+}

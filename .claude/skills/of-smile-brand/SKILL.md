@@ -37,6 +37,7 @@ The app is used by a non-technical assistant, often from a phone and in the midd
 - **Secondary buttons**: "soft" (`--brand-soft` background, `--brand` text) for repeated row actions like "Send"; "outline" (`--border` border, `--text` text) for neutral ones like "Mark contacted". They don't count against the one-primary-button rule.
 - **Avatars**: circle with initials, background a tint of one state color (`--info`, `--warning`, `--brand`, `--danger`) via the `-soft` tokens, text `--text`.
 - **Demo cues**: mark the working part of a visual-only prototype with a "Live" pill (`--brand-soft` background, `--brand` text, 11px, uppercase) and, on first visit, a coachmark bubble (`--surface-2`, 1px `--brand` border, `--radius`, arrow toward its target) with one sentence and a "Got it" button. Dismissible with Esc, never blocks the page, shown once.
+- **Destructive actions**: never the green primary button. Trigger is an icon-only button (`--text-muted`, `--danger` on hover, ≥44px, with `aria-label`). Confirm inline in the same row on a `--danger-soft` background, naming what will be removed, with an outline "Cancel" and a "Delete" button (`--danger` background, `--on-danger` text), both ≥44px. Esc cancels.
 - **Notices**: a full-width banner for global warnings (e.g. demo mode): `--warning-soft` background, `--warning` text, 14px, one sentence, above the top bar.
 - **Icons**: small inline SVG (24×24 viewBox, 1.75 stroke, `currentColor`); no icon libraries. Pair icon-only buttons with an `aria-label`.
 

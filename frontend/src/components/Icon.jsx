@@ -12,6 +12,7 @@ const PATHS = {
   check: (<path d="M20 6 9 17l-5-5" />),
   more: (<><circle cx="5" cy="12" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /></>),
   chevron: (<path d="m9 18 6-6-6-6" />),
+  trash: (<><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" /><path d="M10 11v6M14 11v6" /></>),
   sparkle: (<path d="m12 3 1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z" />),
 };
 
