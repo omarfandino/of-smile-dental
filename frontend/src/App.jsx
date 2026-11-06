@@ -1,30 +1,30 @@
 import { useEffect, useState } from "react";
-import { listarPacientes } from "./api.js";
-import PacienteForm from "./components/PacienteForm.jsx";
-import PacienteLista from "./components/PacienteLista.jsx";
+import { listPatients } from "./api.js";
+import PatientForm from "./components/PatientForm.jsx";
+import PatientList from "./components/PatientList.jsx";
 
 export default function App() {
-  const [pacientes, setPacientes] = useState([]);
-  const [cargando, setCargando] = useState(true);
+  const [patients, setPatients] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    listarPacientes()
-      .then(setPacientes)
+    listPatients()
+      .then(setPatients)
       .catch((e) => setError(e.message))
-      .finally(() => setCargando(false));
+      .finally(() => setLoading(false));
   }, []);
 
   return (
-    <main className="contenedor">
+    <main className="container">
       <header>
         <h1>
-          <span className="marca">OF</span> Smile
+          <span className="brand">OF</span> Smile
         </h1>
-        <p className="sub">¡Hola, Laura! Registra a tus pacientes en segundos.</p>
+        <p className="sub">Hi, Laura! Register your patients in seconds.</p>
       </header>
-      <PacienteForm onCreado={(p) => setPacientes((lista) => [p, ...lista])} />
-      <PacienteLista pacientes={pacientes} cargando={cargando} error={error} />
+      <PatientForm onCreated={(p) => setPatients((list) => [p, ...list])} />
+      <PatientList patients={patients} loading={loading} error={error} />
     </main>
   );
 }

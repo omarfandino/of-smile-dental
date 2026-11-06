@@ -1,22 +1,22 @@
-// Los datos del paciente viajan solo en el cuerpo (nunca en la URL).
-export async function listarPacientes() {
-  const r = await fetch("/api/pacientes");
-  if (!r.ok) throw new Error("No se pudo cargar la lista de pacientes");
+// Patient data travels only in the request body (never in the URL).
+export async function listPatients() {
+  const r = await fetch("/api/patients");
+  if (!r.ok) throw new Error("Could not load the patient list");
   return r.json();
 }
 
-export async function crearPaciente(datos) {
+export async function createPatient(data) {
   let r;
   try {
-    r = await fetch("/api/pacientes", {
+    r = await fetch("/api/patients", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(datos),
+      body: JSON.stringify(data),
     });
   } catch {
-    return { errores: { general: "Sin conexión con el servidor. Intenta de nuevo." } };
+    return { errors: { general: "No connection to the server. Please try again." } };
   }
-  const cuerpo = await r.json().catch(() => ({}));
-  if (r.ok) return { paciente: cuerpo };
-  return { errores: cuerpo.errores || { general: "No se pudo guardar. Intenta de nuevo." } };
+  const body = await r.json().catch(() => ({}));
+  if (r.ok) return { patient: body };
+  return { errors: body.errors || { general: "Could not save. Please try again." } };
 }

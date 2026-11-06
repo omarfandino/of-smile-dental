@@ -36,79 +36,79 @@ def init_db() -> None:
     with get_conn() as conn:
         conn.execute(
             """
-            CREATE TABLE IF NOT EXISTS pacientes (
+            CREATE TABLE IF NOT EXISTS patients (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                nombre TEXT NOT NULL,
+                name TEXT NOT NULL,
                 whatsapp TEXT NOT NULL UNIQUE,
                 email TEXT,
-                notas TEXT,
-                creado_en TEXT NOT NULL
+                notes TEXT,
+                created_at TEXT NOT NULL
             )
             """
         )
 
 
-def normalizar_whatsapp(raw: str) -> str:
-    digitos = re.sub(r"\D", "", raw or "")
-    if digitos.startswith("00"):
-        digitos = digitos[2:]
-    if len(digitos) == 10:
-        digitos = country_code() + digitos
-    if not 11 <= len(digitos) <= 15:
+def normalize_whatsapp(raw: str) -> str:
+    digits = re.sub(r"\D", "", raw or "")
+    if digits.startswith("00"):
+        digits = digits[2:]
+    if len(digits) == 10:
+        digits = country_code() + digits
+    if not 11 <= len(digits) <= 15:
         raise ValueError(
-            "Escribe el número de WhatsApp completo (10 dígitos, o con código de país)"
+            "Enter the full WhatsApp number (10 digits, or with country code)"
         )
-    return digitos
+    return digits
 
 
-class PacienteIn(BaseModel):
+class PatientIn(BaseModel):
     model_config = ConfigDict(validate_default=True)
 
-    nombre: str = ""
+    name: str = ""
     whatsapp: str = ""
     email: str = ""
-    notas: str = ""
+    notes: str = ""
 
-    @field_validator("nombre")
+    @field_validator("name")
     @classmethod
-    def _nombre(cls, v: str) -> str:
+    def _name(cls, v: str) -> str:
         v = " ".join(v.split())
         if len(v) < 2:
-            raise ValueError("Escribe el nombre del paciente")
+            raise ValueError("Enter the patient's name")
         if len(v) > 100:
-            raise ValueError("El nombre es muy largo (máximo 100 caracteres)")
+            raise ValueError("The name is too long (100 characters max)")
         return v
 
     @field_validator("whatsapp")
     @classmethod
     def _whatsapp(cls, v: str) -> str:
-        return normalizar_whatsapp(v)
+        return normalize_whatsapp(v)
 
     @field_validator("email")
     @classmethod
     def _email(cls, v: str) -> str:
         v = v.strip()
         if v and not EMAIL_RE.match(v):
-            raise ValueError("El correo no parece válido (ej. nombre@correo.com)")
+            raise ValueError("That email doesn't look valid (e.g. name@email.com)")
         return v
 
-    @field_validator("notas")
+    @field_validator("notes")
     @classmethod
-    def _notas(cls, v: str) -> str:
+    def _notes(cls, v: str) -> str:
         v = v.strip()
         if len(v) > 300:
-            raise ValueError("Las notas admiten máximo 300 caracteres")
+            raise ValueError("Notes can be 300 characters at most")
         return v
 
 
-def fila_a_dict(row: sqlite3.Row) -> dict:
+def row_to_dict(row: sqlite3.Row) -> dict:
     return {
         "id": row["id"],
-        "nombre": row["nombre"],
+        "name": row["name"],
         "whatsapp": row["whatsapp"],
         "email": row["email"] or "",
-        "notas": row["notas"] or "",
-        "creado_en": row["creado_en"],
+        "notes": row["notes"] or "",
+        "created_at": row["created_at"],
     }
 
 
@@ -117,68 +117,66 @@ def create_app() -> FastAPI:
     app = FastAPI(title="OF Smile API")
 
     @app.exception_handler(RequestValidationError)
-    async def _validacion(_: Request, exc: RequestValidationError):
-        errores: dict[str, str] = {}
+    async def _validation(_: Request, exc: RequestValidationError):
+        errors: dict[str, str] = {}
         for e in exc.errors():
             loc = [p for p in e.get("loc", ()) if p != "body"]
-            campo = str(loc[0]) if loc else "general"
-            msg = str(e.get("msg", "Dato inválido"))
+            field = str(loc[0]) if loc else "general"
+            msg = str(e.get("msg", "Invalid value"))
             msg = msg.removeprefix("Value error, ")
             if e.get("type") != "value_error":
-                msg = "Dato inválido, revisa este campo"
-            errores.setdefault(campo, msg)
-        return JSONResponse(status_code=422, content={"errores": errores})
+                msg = "Invalid value, please check this field"
+            errors.setdefault(field, msg)
+        return JSONResponse(status_code=422, content={"errors": errors})
 
-    @app.get("/api/salud")
-    def salud():
+    @app.get("/api/health")
+    def health():
         return {"ok": True}
 
-    @app.get("/api/pacientes")
-    def listar():
+    @app.get("/api/patients")
+    def list_patients():
         with get_conn() as conn:
-            rows = conn.execute(
-                "SELECT * FROM pacientes ORDER BY id DESC"
-            ).fetchall()
-        return [fila_a_dict(r) for r in rows]
+            rows = conn.execute("SELECT * FROM patients ORDER BY id DESC").fetchall()
+        return [row_to_dict(r) for r in rows]
 
-    @app.post("/api/pacientes", status_code=201)
-    def crear(p: PacienteIn):
+    @app.post("/api/patients", status_code=201)
+    def create_patient(p: PatientIn):
         with get_conn() as conn:
-            existente = conn.execute(
-                "SELECT nombre FROM pacientes WHERE whatsapp = ?", (p.whatsapp,)
+            existing = conn.execute(
+                "SELECT name FROM patients WHERE whatsapp = ?", (p.whatsapp,)
             ).fetchone()
-            if existente:
+            if existing:
                 return JSONResponse(
                     status_code=409,
                     content={
-                        "errores": {
-                            "whatsapp": "Ya existe un paciente con este WhatsApp: "
-                            + existente["nombre"]
+                        "errors": {
+                            "whatsapp": "A patient with this WhatsApp already exists: "
+                            + existing["name"]
                         }
                     },
                 )
             try:
                 cur = conn.execute(
-                    "INSERT INTO pacientes (nombre, whatsapp, email, notas, creado_en)"
+                    "INSERT INTO patients (name, whatsapp, email, notes, created_at)"
                     " VALUES (?, ?, ?, ?, ?)",
                     (
-                        p.nombre,
+                        p.name,
                         p.whatsapp,
                         p.email,
-                        p.notas,
+                        p.notes,
                         datetime.now(timezone.utc).isoformat(timespec="seconds"),
                     ),
                 )
             except sqlite3.IntegrityError:
-                # Doble envío simultáneo: otro request ganó la carrera.
+                # Simultaneous double submit: another request won the race.
                 return JSONResponse(
                     status_code=409,
-                    content={"errores": {"whatsapp": "Ya existe un paciente con este WhatsApp"}},
+                    content={"errors": {"whatsapp": "A patient with this WhatsApp already exists"}},
                 )
             row = conn.execute(
-                "SELECT * FROM pacientes WHERE id = ?", (cur.lastrowid,)
+                "SELECT * FROM patients WHERE id = ?", (cur.lastrowid,)
             ).fetchone()
-        return fila_a_dict(row)
+        return row_to_dict(row)
 
     return app
 

@@ -1,29 +1,29 @@
-/* Tokens de marca OF Smile — inspirados en la identidad de Código Facilito.
-   Fuente de verdad: .claude/skills/of-smile-brand/SKILL.md
-   Copia idéntica en frontend/src/tokens.css */
+/* OF Smile brand tokens — inspired by the Código Facilito look.
+   Source of truth: .claude/skills/of-smile-brand/SKILL.md
+   Identical copy in frontend/src/tokens.css */
 :root {
-  /* Fondos */
+  /* Backgrounds */
   --bg: #0b0f19;
   --surface: #1e293b;
   --surface-2: #273449;
   --border: #334155;
 
-  /* Texto */
+  /* Text */
   --text: #ffffff;
   --text-muted: #94a3b8;
 
-  /* Marca */
+  /* Brand */
   --brand: #00b16c;
   --brand-hover: #00c97b;
-  --on-brand: #04130c; /* texto sobre verde: oscuro, el blanco no alcanza contraste */
+  --on-brand: #04130c; /* text on green: dark, white lacks contrast */
 
-  /* Estados */
+  /* States */
   --info: #3b82f6;
   --warning: #f59e0b;
   --danger: #f87171;
   --success: #00b16c;
 
-  /* Forma y ritmo */
+  /* Shape and rhythm */
   --radius: 12px;
   --radius-sm: 8px;
   --space-1: 4px;

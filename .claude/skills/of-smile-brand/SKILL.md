@@ -1,51 +1,52 @@
 ---
 name: of-smile-brand
-description: Identidad visual y sistema de diseño de la app OF Smile (consultorio dental de la Dra. Laura), inspirado en Código Facilito - tema oscuro, verde #00B16C, tarjetas redondeadas, tono cercano en español. Úsala siempre que crees o modifiques cualquier pantalla, componente, formulario, botón, badge, CSS o paleta de este proyecto, aunque el usuario solo diga "haz la pantalla de...", "ponle estilos" o "que se vea bien". No uses colores ni estilos inventados fuera de esta skill.
+description: Visual identity and design system for the OF Smile app (Dr. Laura's dental clinic), inspired by Código Facilito - dark theme, green #00B16C, rounded cards, friendly tone. Use whenever you create or modify any screen, component, form, button, badge, CSS or color in this project, even if the user only says "build the screen for...", "style it" or "make it look good". Do not use colors or styles invented outside this skill.
 ---
 
-# OF Smile — diseño de marca
+# OF Smile — brand design
 
-La app la usa una asistente no técnica, muchas veces desde el celular y durante el trabajo. El estilo es oscuro, limpio y de alto contraste (referencia: plataformas de educación en tecnología como Código Facilito), pero el contenido es un consultorio dental: priorizar legibilidad y acciones obvias sobre decoración.
+The app is used by a non-technical assistant, often from a phone and in the middle of other work. The style is dark, clean and high-contrast (reference: tech-education platforms like Código Facilito), but the content is a dental clinic: favor readability and obvious actions over decoration.
 
-## Antes de escribir UI
-1. Importa los tokens: `assets/tokens.css` de esta skill (copia en `frontend/src/tokens.css`). Todo color, radio y espaciado sale de ahí como variable CSS. No escribas hex sueltos en componentes.
-2. Si necesitas un color nuevo, agrégalo primero a los tokens; no lo inventes en el componente.
+## Before writing UI
+1. Import the tokens: `assets/tokens.css` from this skill (copy at `frontend/src/tokens.css`). Every color, radius and spacing comes from there as a CSS variable. Don't write loose hex values in components.
+2. If you need a new color, add it to the tokens first; don't invent it in the component.
 
-## Paleta (resumen; valores exactos en `assets/tokens.css`)
-| Uso | Token | Valor |
+## Palette (summary; exact values in `assets/tokens.css`)
+| Use | Token | Value |
 |---|---|---|
-| Fondo de página | `--bg` | `#0b0f19` |
-| Tarjetas / superficies | `--surface` | `#1e293b` |
-| Bordes | `--border` | `#334155` |
-| Texto principal | `--text` | `#ffffff` |
-| Texto secundario | `--text-muted` | `#94a3b8` |
-| Acento de marca | `--brand` | `#00b16c` |
-| Info / Alerta / Error | `--info` / `--warning` / `--danger` | azul / ámbar / rojo suave |
+| Page background | `--bg` | `#0b0f19` |
+| Cards / surfaces | `--surface` | `#1e293b` |
+| Borders | `--border` | `#334155` |
+| Primary text | `--text` | `#ffffff` |
+| Secondary text | `--text-muted` | `#94a3b8` |
+| Brand accent | `--brand` | `#00b16c` |
+| Info / Warning / Error | `--info` / `--warning` / `--danger` | blue / amber / soft red |
 
-## Reglas
-- **Botón primario**: fondo `--brand`, texto `--on-brand` (oscuro). El texto blanco sobre ese verde no cumple contraste; no lo uses. Hover `--brand-hover`. Un solo botón primario por pantalla/formulario.
-- **Tarjetas**: `--surface`, borde 1px `--border`, `border-radius: var(--radius)`, padding `--space-4` (móvil) a `--space-6` (escritorio).
-- **Inputs**: fondo `--bg`, borde `--border`, radio `--radius-sm`, altura mínima 44px (se usan con el dedo). Foco visible: borde y anillo `--brand`. Etiqueta siempre visible encima (no solo placeholder).
-- **Errores**: texto `--danger` bajo el campo, en español, diciendo cómo corregir ("Escribe el número con 10 dígitos"), nunca códigos técnicos. El color no es la única señal: incluye el texto.
-- **Éxito**: confirmación breve con `--success`, que no bloquee el siguiente paso.
-- **Badges de estado** (para fases futuras: programada, confirmada, asistió, no asistió, cancelada): píldora pequeña, fondo del color al ~15% de opacidad, texto del color pleno. Verde = confirmada/asistió, ámbar = pendiente/por contactar, azul = programada, rojo = no asistió/cancelada.
-- **Progreso de tratamiento** ("sesión 2 de 3"): barra delgada con relleno `--brand` sobre `--border`, más el texto.
-- **Tipografía**: `--font`; títulos 600–700, cuerpo 16px mínimo (evita zoom en iOS), texto secundario 14px en `--text-muted`.
-- **Movimiento**: transiciones de `--transition` solo en color, borde y sombra. Sin animaciones decorativas.
-- **Responsive**: mobile-first, contenedor máx. 720px centrado, una columna en móvil. Sin scroll horizontal a 375px.
+## Rules
+- **Primary button**: `--brand` background, `--on-brand` (dark) text. White text on this green fails contrast; don't use it. Hover `--brand-hover`. One primary button per screen/form.
+- **Cards**: `--surface`, 1px `--border`, `border-radius: var(--radius)`, padding `--space-4` (mobile) to `--space-6` (desktop).
+- **Inputs**: `--bg` background, `--border` border, `--radius-sm`, minimum height 44px (they're used with a finger). Visible focus: `--brand` border and ring. Always a visible label above (not just a placeholder).
+- **Errors**: `--danger` text under the field, in plain English, saying how to fix it ("Enter the number with 10 digits"), never technical codes. Color is not the only signal: include the text.
+- **Success**: brief confirmation in `--success` that doesn't block the next step.
+- **Status badges** (for future phases: scheduled, confirmed, attended, no-show, cancelled): small pill, background in the color at ~15% opacity, text in the full color. Green = confirmed/attended, amber = pending/to contact, blue = scheduled, red = no-show/cancelled.
+- **Treatment progress** ("session 2 of 3"): thin bar filled with `--brand` over `--border`, plus the text.
+- **Typography**: `--font`; headings 600–700, body 16px minimum (avoids iOS zoom), secondary text 14px in `--text-muted`.
+- **Motion**: `--transition` only on color, border and shadow. No decorative animation.
+- **Responsive**: mobile-first, max container 720px centered, one column on mobile. No horizontal scroll at 375px.
 
-## Tono de los textos
-Cercano, profesional y directo, en español de tú. Verbos de acción en botones ("Guardar paciente", no "Enviar"). Mensajes que confirman lo que pasó: "Paciente guardado: Ana Pérez". Evita jerga técnica y signos de exclamación excesivos; un saludo cálido en la pantalla principal está bien ("¡Hola, Laura!").
+## Tone of the copy
+Friendly, professional and direct, in plain English. Action verbs on buttons ("Save patient", not "Submit"). Messages that confirm what happened: "Patient saved: Ana Pérez". Avoid technical jargon and excessive exclamation marks; a warm greeting on the main screen is fine ("Hi, Laura!").
 
-## Qué NO hacer
-- No copiar logos, nombres ni textos de Código Facilito: solo se toma la sensación visual (oscuro + verde + tarjetas redondeadas).
-- No usar bloques de código con resaltado de sintaxis ni badges de nivel (Principiante/Avanzado): eso es del dominio educativo, no de este producto.
-- No agregar librerías de UI ni de íconos para cumplir estas reglas; CSS plano con tokens basta.
-- No poner datos personales de pacientes en ejemplos reales: usa nombres ficticios.
+## What NOT to do
+- Don't copy Código Facilito's logos, names or copy: only the visual feel is borrowed (dark + green + rounded cards).
+- Don't use syntax-highlighted code blocks or level badges (Beginner/Advanced): those belong to the education domain, not this product.
+- Don't add UI or icon libraries to satisfy these rules; plain CSS with tokens is enough.
+- Don't put real patient data in examples: use fictional names.
 
-## Revisión rápida antes de entregar
-- [ ] Todos los colores vienen de tokens
-- [ ] Un solo botón primario, texto oscuro sobre verde
-- [ ] Inputs ≥44px, con etiqueta y foco visible
-- [ ] Errores en español con la acción para corregir
-- [ ] Se ve bien a 375px y a 1280px
+## Self-check before delivering
+These are the rules that are easiest to forget and cheapest to fix before handing UI back. Go through them against the code you wrote, and fix anything that fails rather than reporting it.
+- [ ] All colors come from tokens
+- [ ] Single primary button, dark text on green
+- [ ] Inputs ≥44px, with a label and visible focus
+- [ ] Errors in plain English with the action to fix them
+- [ ] Looks right at 375px and at 1280px
