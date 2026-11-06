@@ -14,7 +14,8 @@ EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
 def database_url() -> str:
-    return os.environ["DATABASE_URL"]
+    # Tolerate surrounding whitespace/quotes, a common copy-paste slip from .env files.
+    return os.environ["DATABASE_URL"].strip().strip("\"'")
 
 
 def country_code() -> str:

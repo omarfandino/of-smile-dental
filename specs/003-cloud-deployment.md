@@ -11,7 +11,7 @@ The course requires a live demo. The free hosting tier (Render) has an ephemeral
 - **Database:** PostgreSQL. In production a free Neon project; locally a Postgres container with a named volume. The backend reads `DATABASE_URL`; the SQLite code is removed.
 - **App:** one container serving both the API (`/api/...`) and the built UI (`/`), listening on `$PORT` (default 8000). Deployed as a single Render web service from a blueprint (`render.yaml`).
 - **Local:** `docker compose up --build` starts `db` (Postgres, volume `ofsmile_pgdata`) and `app` at http://localhost:8080.
-- **Secrets:** `DATABASE_URL` is never committed; in Render it is set in the dashboard (`sync: false` in the blueprint).
+- **Secrets:** `DATABASE_URL` is never committed, and surrounding quotes or whitespace pasted with it are ignored; in Render it is set in the dashboard (`sync: false` in the blueprint).
 
 ### Data model
 Same fields as spec 001. In Postgres: `id` identity, `name`, `whatsapp` (unique), `email`, `notes`, `created_at` as `timestamptz`, returned to the client as an ISO-8601 UTC string. Duplicate detection uses a single atomic `INSERT ... ON CONFLICT (whatsapp) DO NOTHING`.

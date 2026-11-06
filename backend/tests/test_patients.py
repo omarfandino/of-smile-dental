@@ -53,3 +53,10 @@ def test_health_reports_demo_flag(client, monkeypatch):
     assert client.get("/api/health").json() == {"ok": True, "demo": False}
     monkeypatch.setenv("DEMO_MODE", "1")
     assert client.get("/api/health").json()["demo"] is True
+
+
+def test_database_url_ignores_surrounding_quotes(monkeypatch):
+    import app.main as main
+
+    monkeypatch.setenv("DATABASE_URL", ' "postgresql://u:p@h/db" ')
+    assert main.database_url() == "postgresql://u:p@h/db"
