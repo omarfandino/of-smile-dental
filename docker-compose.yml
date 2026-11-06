@@ -1,0 +1,20 @@
+services:
+  backend:
+    build: ./backend
+    environment:
+      DB_PATH: /data/ofsmile.db
+      DEFAULT_COUNTRY_CODE: "57"   # cambia según el país del consultorio
+    volumes:
+      - ofsmile_data:/data
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  ofsmile_data:
