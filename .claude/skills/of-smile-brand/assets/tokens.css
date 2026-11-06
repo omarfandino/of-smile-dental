@@ -23,6 +23,12 @@
   --danger: #f87171;
   --success: #00b16c;
 
+  /* Soft tints (badges, avatars, soft buttons) */
+  --brand-soft: color-mix(in srgb, var(--brand) 15%, transparent);
+  --info-soft: color-mix(in srgb, var(--info) 18%, transparent);
+  --warning-soft: color-mix(in srgb, var(--warning) 18%, transparent);
+  --danger-soft: color-mix(in srgb, var(--danger) 18%, transparent);
+
   /* Shape and rhythm */
   --radius: 12px;
   --radius-sm: 8px;

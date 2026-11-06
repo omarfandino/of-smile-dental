@@ -32,7 +32,11 @@ The app is used by a non-technical assistant, often from a phone and in the midd
 - **Treatment progress** ("session 2 of 3"): thin bar filled with `--brand` over `--border`, plus the text.
 - **Typography**: `--font`; headings 600–700, body 16px minimum (avoids iOS zoom), secondary text 14px in `--text-muted`.
 - **Motion**: `--transition` only on color, border and shadow. No decorative animation.
-- **Responsive**: mobile-first, max container 720px centered, one column on mobile. No horizontal scroll at 375px.
+- **App layout**: at ≥900px a fixed left sidebar (`--surface`, 1px `--border` on its right edge) plus a top bar and content capped at 1100px; below 900px the sidebar becomes a bottom tab bar (icon above label, four main items). Active menu item: `--brand-soft` background with `--brand` text. Forms and single-purpose pages may stay narrower (≤720px).
+- **Responsive**: mobile-first, one column on mobile. No horizontal scroll at 375px.
+- **Secondary buttons**: "soft" (`--brand-soft` background, `--brand` text) for repeated row actions like "Send"; "outline" (`--border` border, `--text` text) for neutral ones like "Mark contacted". They don't count against the one-primary-button rule.
+- **Avatars**: circle with initials, background a tint of one state color (`--info`, `--warning`, `--brand`, `--danger`) via the `-soft` tokens, text `--text`.
+- **Icons**: small inline SVG (24×24 viewBox, 1.75 stroke, `currentColor`); no icon libraries. Pair icon-only buttons with an `aria-label`.
 
 ## Tone of the copy
 Friendly, professional and direct, in plain English. Action verbs on buttons ("Save patient", not "Submit"). Messages that confirm what happened: "Patient saved: Ana Pérez". Avoid technical jargon and excessive exclamation marks; a warm greeting on the main screen is fine ("Hi, Laura!").
@@ -42,6 +46,7 @@ Friendly, professional and direct, in plain English. Action verbs on buttons ("S
 - Don't use syntax-highlighted code blocks or level badges (Beginner/Advanced): those belong to the education domain, not this product.
 - Don't add UI or icon libraries to satisfy these rules; plain CSS with tokens is enough.
 - Don't put real patient data in examples: use fictional names.
+- Don't claim things the product doesn't do (e.g. "your data is protected" while there is no login).
 
 ## Self-check before delivering
 These are the rules that are easiest to forget and cheapest to fix before handing UI back. Go through them against the code you wrote, and fix anything that fails rather than reporting it.

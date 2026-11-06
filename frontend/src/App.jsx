@@ -1,30 +1,28 @@
 import { useEffect, useState } from "react";
-import { listPatients } from "./api.js";
-import PatientForm from "./components/PatientForm.jsx";
-import PatientList from "./components/PatientList.jsx";
+import Sidebar from "./components/Sidebar.jsx";
+import Topbar from "./components/Topbar.jsx";
+import Overview from "./pages/Overview.jsx";
+import Patients from "./pages/Patients.jsx";
+
+// Hash routing: the hash never carries personal data.
+const readRoute = () => (window.location.hash === "#/patients" ? "patients" : "overview");
 
 export default function App() {
-  const [patients, setPatients] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [route, setRoute] = useState(readRoute);
 
   useEffect(() => {
-    listPatients()
-      .then(setPatients)
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
+    const onChange = () => setRoute(readRoute());
+    window.addEventListener("hashchange", onChange);
+    return () => window.removeEventListener("hashchange", onChange);
   }, []);
 
   return (
-    <main className="container">
-      <header>
-        <h1>
-          <span className="brand">OF</span> Smile
-        </h1>
-        <p className="sub">Hi, Laura! Register your patients in seconds.</p>
-      </header>
-      <PatientForm onCreated={(p) => setPatients((list) => [p, ...list])} />
-      <PatientList patients={patients} loading={loading} error={error} />
-    </main>
+    <div className="app">
+      <Sidebar route={route} />
+      <div className="main">
+        <Topbar title={route === "patients" ? "Patients" : "Overview"} />
+        <main className="content">{route === "patients" ? <Patients /> : <Overview />}</main>
+      </div>
+    </div>
   );
 }
