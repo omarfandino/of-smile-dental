@@ -1,6 +1,6 @@
 # Spec 001 — Patient registration
 
-Status: draft, validated · Scope: UI + minimal API with persistence
+Status: draft, validated · Scope: UI + minimal API with persistence (storage engine defined in spec 003)
 
 ## 1. Problem
 Dr. Laura's assistant schedules in Google Calendar today, which doesn't know who the patient is or how to reach them. Without a patient registry with WhatsApp numbers, reminders can't be sent and treatments can't be followed up (the two causes of loss: ~30% no-shows and abandoned treatments). Registration is the first step of the whole flow, and the business rule is: **you can't schedule someone who isn't registered**.
@@ -33,7 +33,7 @@ Also: `id`, `created_at` (UTC). The normalized `whatsapp` is **unique**.
 - Each patient in the list shows name and a readable WhatsApp number, plus an empty state when there are none ("No patients yet. Register the first one above.").
 
 ### Persistence
-SQLite in a named Docker volume; data survives `docker compose down` and `docker compose restart`.
+PostgreSQL (see spec 003). Locally it runs in a container with a named Docker volume; data survives `docker compose down` and `docker compose restart`.
 
 ### Scope decisions
 - No login or roles: a single person uses it on their own machine. Authentication is added before exposing it to the internet (later phase).

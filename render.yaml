@@ -1,0 +1,17 @@
+# Render blueprint: one web service built from the root Dockerfile.
+# The database lives in Neon; paste its connection string as DATABASE_URL
+# in the Render dashboard when prompted (never commit it).
+services:
+  - type: web
+    name: of-smile
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: DEMO_MODE
+        value: "1"
+      - key: DEFAULT_COUNTRY_CODE
+        value: "57"

@@ -1,17 +1,6 @@
-import importlib
-
 import pytest
-from fastapi.testclient import TestClient
 
-
-@pytest.fixture()
-def client(tmp_path, monkeypatch):
-    monkeypatch.setenv("DB_PATH", str(tmp_path / "test.db"))
-    monkeypatch.setenv("DEFAULT_COUNTRY_CODE", "57")
-    import app.main as main
-
-    importlib.reload(main)
-    return TestClient(main.app)
+from tests.conftest import load_app
 
 
 def test_create_normalizes_and_lists_newest_first(client):
@@ -25,16 +14,11 @@ def test_create_normalizes_and_lists_newest_first(client):
     assert client.get("/api/patients").json()[0]["name"] == "Ana Pérez"
 
 
-def test_persists_across_instances(tmp_path, monkeypatch):
-    monkeypatch.setenv("DB_PATH", str(tmp_path / "p.db"))
-    import app.main as main
-
-    importlib.reload(main)
-    TestClient(main.app).post(
-        "/api/patients", json={"name": "Ana", "whatsapp": "3001234567"}
-    )
-    importlib.reload(main)  # simulates a container restart
-    assert len(TestClient(main.app).get("/api/patients").json()) == 1
+def test_persists_across_instances():
+    first = load_app()
+    first.post("/api/patients", json={"name": "Ana", "whatsapp": "3001234567"})
+    second = load_app(reset=False)  # simulates an app restart on the same database
+    assert len(second.get("/api/patients").json()) == 1
 
 
 @pytest.mark.parametrize(
@@ -63,3 +47,9 @@ def test_duplicate_in_different_format(client):
     assert r.status_code == 409
     assert "Ana" in r.json()["errors"]["whatsapp"]
     assert len(client.get("/api/patients").json()) == 1
+
+
+def test_health_reports_demo_flag(client, monkeypatch):
+    assert client.get("/api/health").json() == {"ok": True, "demo": False}
+    monkeypatch.setenv("DEMO_MODE", "1")
+    assert client.get("/api/health").json()["demo"] is True

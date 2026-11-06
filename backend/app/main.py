@@ -1,19 +1,20 @@
 import os
 import re
-import sqlite3
 from contextlib import contextmanager
-from datetime import datetime, timezone
 
+import psycopg
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
+from psycopg.rows import dict_row
 from pydantic import BaseModel, ConfigDict, field_validator
 
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
-def db_path() -> str:
-    return os.environ.get("DB_PATH", "/data/ofsmile.db")
+def database_url() -> str:
+    return os.environ["DATABASE_URL"]
 
 
 def country_code() -> str:
@@ -22,27 +23,28 @@ def country_code() -> str:
 
 @contextmanager
 def get_conn():
-    conn = sqlite3.connect(db_path())
-    conn.row_factory = sqlite3.Row
-    try:
+    # prepare_threshold=None: safe behind connection poolers such as Neon's.
+    # Leaving the block commits; an exception rolls back.
+    with psycopg.connect(
+        database_url(),
+        row_factory=dict_row,
+        connect_timeout=15,
+        prepare_threshold=None,
+    ) as conn:
         yield conn
-        conn.commit()
-    finally:
-        conn.close()
 
 
 def init_db() -> None:
-    os.makedirs(os.path.dirname(db_path()) or ".", exist_ok=True)
     with get_conn() as conn:
         conn.execute(
             """
             CREATE TABLE IF NOT EXISTS patients (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
                 name TEXT NOT NULL,
                 whatsapp TEXT NOT NULL UNIQUE,
-                email TEXT,
-                notes TEXT,
-                created_at TEXT NOT NULL
+                email TEXT NOT NULL DEFAULT '',
+                notes TEXT NOT NULL DEFAULT '',
+                created_at TIMESTAMPTZ NOT NULL DEFAULT now()
             )
             """
         )
@@ -101,14 +103,14 @@ class PatientIn(BaseModel):
         return v
 
 
-def row_to_dict(row: sqlite3.Row) -> dict:
+def row_to_dict(row: dict) -> dict:
     return {
         "id": row["id"],
         "name": row["name"],
         "whatsapp": row["whatsapp"],
-        "email": row["email"] or "",
-        "notes": row["notes"] or "",
-        "created_at": row["created_at"],
+        "email": row["email"],
+        "notes": row["notes"],
+        "created_at": row["created_at"].isoformat(timespec="seconds"),
     }
 
 
@@ -131,21 +133,29 @@ def create_app() -> FastAPI:
 
     @app.get("/api/health")
     def health():
-        return {"ok": True}
+        return {"ok": True, "demo": os.environ.get("DEMO_MODE") == "1"}
 
     @app.get("/api/patients")
     def list_patients():
         with get_conn() as conn:
-            rows = conn.execute("SELECT * FROM patients ORDER BY id DESC").fetchall()
+            rows = conn.execute(
+                "SELECT * FROM patients ORDER BY id DESC"
+            ).fetchall()
         return [row_to_dict(r) for r in rows]
 
     @app.post("/api/patients", status_code=201)
     def create_patient(p: PatientIn):
         with get_conn() as conn:
-            existing = conn.execute(
-                "SELECT name FROM patients WHERE whatsapp = ?", (p.whatsapp,)
+            row = conn.execute(
+                "INSERT INTO patients (name, whatsapp, email, notes)"
+                " VALUES (%s, %s, %s, %s)"
+                " ON CONFLICT (whatsapp) DO NOTHING RETURNING *",
+                (p.name, p.whatsapp, p.email, p.notes),
             ).fetchone()
-            if existing:
+            if row is None:
+                existing = conn.execute(
+                    "SELECT name FROM patients WHERE whatsapp = %s", (p.whatsapp,)
+                ).fetchone()
                 return JSONResponse(
                     status_code=409,
                     content={
@@ -155,28 +165,12 @@ def create_app() -> FastAPI:
                         }
                     },
                 )
-            try:
-                cur = conn.execute(
-                    "INSERT INTO patients (name, whatsapp, email, notes, created_at)"
-                    " VALUES (?, ?, ?, ?, ?)",
-                    (
-                        p.name,
-                        p.whatsapp,
-                        p.email,
-                        p.notes,
-                        datetime.now(timezone.utc).isoformat(timespec="seconds"),
-                    ),
-                )
-            except sqlite3.IntegrityError:
-                # Simultaneous double submit: another request won the race.
-                return JSONResponse(
-                    status_code=409,
-                    content={"errors": {"whatsapp": "A patient with this WhatsApp already exists"}},
-                )
-            row = conn.execute(
-                "SELECT * FROM patients WHERE id = ?", (cur.lastrowid,)
-            ).fetchone()
         return row_to_dict(row)
+
+    # The built UI is served last so it never shadows /api routes.
+    static_dir = os.environ.get("STATIC_DIR", "/srv/static")
+    if os.path.isdir(static_dir):
+        app.mount("/", StaticFiles(directory=static_dir, html=True), name="ui")
 
     return app
 

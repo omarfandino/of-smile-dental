@@ -20,3 +20,12 @@ export async function createPatient(data) {
   if (r.ok) return { patient: body };
   return { errors: body.errors || { general: "Could not save. Please try again." } };
 }
+
+export async function getHealth() {
+  try {
+    const r = await fetch("/api/health");
+    return r.ok ? await r.json() : {};
+  } catch {
+    return {};
+  }
+}

@@ -1,20 +1,33 @@
 services:
-  backend:
-    build: ./backend
+  db:
+    image: postgres:16-alpine
     environment:
-      DB_PATH: /data/ofsmile.db
-      DEFAULT_COUNTRY_CODE: "57"   # change to match the clinic's country
+      POSTGRES_USER: ofsmile        # local development credentials only
+      POSTGRES_PASSWORD: ofsmile
+      POSTGRES_DB: ofsmile
     volumes:
-      - ofsmile_data:/data
+      - ofsmile_pgdata:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5433:5432"       # for running pytest from the host (5433 avoids clashing with a local Postgres)
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ofsmile -d ofsmile"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
     restart: unless-stopped
 
-  frontend:
-    build: ./frontend
+  app:
+    build: .
+    environment:
+      DATABASE_URL: postgresql://ofsmile:ofsmile@db:5432/ofsmile
+      DEFAULT_COUNTRY_CODE: "57"   # change to match the clinic's country
+      DEMO_MODE: "${DEMO_MODE:-0}"
     ports:
-      - "8080:80"
+      - "8080:8000"
     depends_on:
-      - backend
+      db:
+        condition: service_healthy
     restart: unless-stopped
 
 volumes:
-  ofsmile_data:
+  ofsmile_pgdata:
