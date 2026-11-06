@@ -6,6 +6,7 @@ services:
     name: of-smile
     runtime: docker
     plan: free
+    region: ohio   # same region as the Neon project (AWS US East - Ohio)
     dockerfilePath: ./Dockerfile
     healthCheckPath: /api/health
     envVars:
