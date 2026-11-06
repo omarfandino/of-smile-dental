@@ -48,3 +48,21 @@
   .crumbs, .search, .user-name { display: none; }
   .content { padding-bottom: 96px; }
 }
+
+/* Working-feature cue (spec 002) */
+.nav-wrap { position: relative; display: flex; }
+.nav-live { margin-left: auto; padding: 1px 8px; border-radius: 999px; background: var(--brand-soft); color: var(--brand); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+.coach { position: absolute; z-index: 20; left: calc(100% + 14px); top: 50%; transform: translateY(-50%); width: 230px; padding: var(--space-3) var(--space-4); background: var(--surface-2); border: 1px solid var(--brand); border-radius: var(--radius); box-shadow: 0 8px 24px color-mix(in srgb, var(--bg) 70%, transparent); }
+.coach::before { content: ""; position: absolute; left: -7px; top: 50%; width: 12px; height: 12px; transform: translateY(-50%) rotate(45deg); background: var(--surface-2); border-left: 1px solid var(--brand); border-bottom: 1px solid var(--brand); }
+.coach p { margin: 0 0 var(--space-2); font-size: 14px; }
+.coach-btn { min-height: 36px; padding: 0 var(--space-3); background: var(--brand-soft); color: var(--brand); border: 1px solid transparent; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; cursor: pointer; transition: border-color var(--transition); }
+.coach-btn:hover { border-color: var(--brand); }
+.coach-btn:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--brand-soft); }
+.sidebar { z-index: 6; }
+
+@media (max-width: 899px) {
+  .nav-wrap { flex: 1; }
+  .nav-live { position: absolute; top: 2px; right: calc(50% - 34px); margin: 0; padding: 0 5px; font-size: 9px; }
+  .coach { left: auto; right: 0; top: auto; bottom: calc(100% + 14px); transform: none; width: min(230px, calc(100vw - 32px)); }
+  .coach::before { left: auto; right: 28px; top: auto; bottom: -7px; transform: rotate(-45deg); border-left: 0; border-bottom: 1px solid var(--brand); border-right: 1px solid var(--brand); }
+}

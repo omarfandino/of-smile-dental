@@ -22,6 +22,11 @@ Patient registration alone is one bare screen. Dr. Laura needs to see what the f
 
 Other inert controls (search, bell, "New appointment", "Send", "Mark contacted", "…", "Edit template", links) also do nothing: no navigation, no request, no state change.
 
+### Working-feature cue
+So a visitor knows Patients is the only working section:
+- **"Live" tag:** a small pill next to "Patients" in the menu, always visible (desktop and mobile).
+- **Welcome tooltip (coachmark):** on first visit to Overview, a bubble points at Patients: "Patients is the working feature. Start here." with a "Got it" button. It closes with "Got it", with Esc, or by opening Patients, and does not reappear in that browser (remembered in `localStorage`; if storage is unavailable it simply shows again).
+
 ### Overview (static mock)
 Greeting with today's date; three stat cards (today's appointments, pending reminders, patients to contact); "Today's schedule" list with status badges; "Pending reminders" list with a "Send" button each and an "Edit template" link; "Patients to contact" list with treatment progress bar ("2 of 3 sessions") and a "Mark contacted" button. All data is fictional and hard-coded in `frontend/src/data/mock.js`. The screen makes no API calls.
 
@@ -40,6 +45,8 @@ Header "Patients"; on desktop the form sits left and the list right, on mobile t
 3. **Overview is a mock.** Opening Overview shows the three stat cards and the three lists with fictional data, and triggers no `/api/` request. *Test: browser network panel.*
 4. **Responsive.** At ≥900 px the sidebar is visible; at 375 px the sidebar is hidden, the bottom tab bar shows four items, and there is no horizontal page scroll. *Test: browser inspection at both widths.*
 5. **Brand.** Colors come only from tokens: no hex or `rgb()` literals in `frontend/src` outside `tokens.css`; primary buttons use `--brand` with `--on-brand` text. *Test: `grep -rnE '#[0-9a-fA-F]{3,6}|rgba?\(' frontend/src --include=*.css --include=*.jsx` returns nothing beyond `tokens.css`.*
+
+6. **Working-feature cue.** The "Live" tag is always visible next to Patients. On a first visit the welcome tooltip appears pointing at Patients; after "Got it" (or Esc, or opening Patients) and a reload it no longer appears. *Test: manual in browser.*
 
 ## 4. Out of this spec
 Real data on Overview, Schedule, Treatments, Settings, search, notifications, login.
